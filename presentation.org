@@ -1,0 +1,697 @@
+#+TITLE:  Functional Programming fundamentals
+#+AUTHOR: Suvash Thapaliya (@suvash)
+#+DATE:   2015-05-28
+#+EMAIL:  hi@suva.sh
+
+#+OPTIONS: toc:nil num:nil
+
+#+REVEAL_THEME: white
+
+* Agenda
+
+#+BEGIN_NOTES
+- Why now ? Why today ?
+#+END_NOTES
+
+** The Dress
+[[./images/thedress.jpg]]
+
+** It's a ..... !
+
+[[./images/duck_rabbit.jpg]]
+
+#+BEGIN_NOTES
+- Introduce terminologies and set the foundations for a different way of viewing at the world.
+- will probably talk about obvious things now and then. allow me to be a bit pedantic ...
+- Present small examples that can be built upon. (Not big applications yet, some other day maybe)
+- not planning to do magic demos to blow your minds
+- not intending to convince you that FP will take over the world
+- not supposed to be a comparision / bashing on a certain paradigm.
+- all models of computation eventually intend to produce artifacts that can be run on a certain computer architecture.
+- feel free to question me anywhere. I might not have all the answers, but will try my best.
+- like calculus/other hard things, sometimes the intuition isn't there in the beginning
+- sometimes one has to first learn the concepts, intuition comes afterwards
+- will consider this a success if I somehow manage to infect you minds to go and look more into FP.
+#+END_NOTES
+
+* Paradigm
+
+n. A set of assumptions, concepts, values, and practices that
+constitutes a way of viewing reality for the community that shares
+them, especially in an intellectual discipline.
+
+** What we already know
+
+#+ATTR_HTML: :width 40% :height 40%
+[[./images/oleg_shuplyak.jpg]]
+
+#+BEGIN_NOTES
+- When we read/write a program, we simulate the world the program runs in and reason about it
+- How we decide to simulate and reason the program eventually is influenced by the paradigm we are in
+- Different programming paradigms : Imperative, OOP, FP, Logic, Stack etc.
+#+END_NOTES
+
+* Programming
+
+"Take the contents of memory address x and add it to the contents of the register EAX."
+
+- Compose / Decompose
+
+#+BEGIN_NOTES
+- Trying to solve a non trivial problem. How do we solve problems ?
+- Decompose bigger to smaller problems until all small problems are solved.
+- The essence : Compose those small solutions to solve a bigger problem.
+- In hindsight, decomposition wouldn't make sense if we couldn't put the pieces back together.
+#+END_NOTES
+
+* History of Functional Programming
+
+- Lambda Calculus (Church & Rosser 1936)
+- LISP (McCarthy 1960)
+- ML (1973) ---- SmallTalk/C (1972)
+- Miranda (1985)
+- Haskell (1992)
+- OCaml (1996)
+- Clojure (2009)
+- Idris (2011)
+
+  and many more to come.
+
+* Let's get started
+
+Define terminologies as precisely as we can.
+
+** Value
+
+Final result of a computation. Cannot be further reduced.
+Eg. 4, 'Hello'
+
+#+BEGIN_NOTES
+Anything that is a value is also known as a first class member in the given language.
+#+END_NOTES
+
+** Expression
+
+A symbol or combination of symbols that represents a value or a relationship between values.
+Eg. 1 + 1 (reduces to 2), 2 is both a value and an expression.
+
+All values are expressions.
+
+#+BEGIN_NOTES
+Don't get confused yet that everything is an expression.
+#+END_NOTES
+
+** Evaluation
+
+The reduction of an expression to a value is called evaluation.
+
+#+BEGIN_SRC python
+1 + 1 + 1
+1 + 2
+3
+#+END_SRC
+
+** Evaluation (..contd)
+
+#+BEGIN_EXAMPLE
++------------+
+| Expression |
++------------+
+      |
+      V
++------------+
+| Evaluation |
++------------+
+      |
+      V
++------------+
+|   Value    |
++------------+
+#+END_EXAMPLE
+
+** Variables
+A reference to a value is a variable.
+
+#+BEGIN_SRC python
+a = 2
+#+END_SRC
+
+** Side effects
+A step in the evaluation of an expression that has effects (read: changes/updates etc.) outside the expression itself is called a side effect.
+
+#+BEGIN_SRC python
+print "hello"
+
+a = 1; a += 1
+#+END_SRC
+
+** Side effects (...contd)
+
+#+BEGIN_EXAMPLE
++------------+
+| Expression |
++------------+
+      |
+      V
++------------+
+| Evaluation |~~~> Side Effect
++------------+
+      |
+      V
++------------+
+|   Value    |
++------------+
+#+END_EXAMPLE
+
+** Statement
+An expression that evaluates to nothing is a statement.
+
+Expression in Python:
+#+BEGIN_SRC python
+a = 1 + 1
+a = lambda x: x ** 2
+#+END_SRC
+
+Statement in Python:
+#+BEGIN_SRC python
+if True:
+  a = 5 + 2456
+else:
+  a = 'goodbye'
+#+END_SRC
+
+** Statement (...contd)
+Only expressions in Clojure and Haskell
+
+#+BEGIN_SRC clojure
+(def a
+  (if true "hello" "goodbye"))
+#+END_SRC
+
+#+BEGIN_SRC
+a = if True
+    then "hello"
+    else "goodbye"
+#+END_SRC
+
+** What's up with statements ?
+
+Statements perform/require side effects and are intrinsically imperative.
+(Insight: since they cannot be reduced to a value, they must be effecting beyond their bounds)
+
+Statements are NOT values.
+
+#+BEGIN_EXAMPLE
++------------+
+| Statement  |
++------------+
+      |
+      V
++------------+
+| Evaluation |~~~> Side Effect
++------------+
+      |
+      X
+#+END_EXAMPLE
+
+
+** Questions so far ?
+
+Some of these things seem obvious, but they have huge implications on how one starts looking at programs.
+
+Especially how side effects differentiate expressions/values from statements, as this is really the foundation that functional programming builds upon.
+
+* Hello Functions !
+
+Simply a mapping of a set of values(aka domain) to another set of values(aka codomain).
+
+[[./images/function.png]]
+
+** Function
+A function is an abstraction over expression, where one or several values in the expression are replaced by variables.
+
+
+#+BEGIN_SRC python
+3 + 1
+4 + 1
+5 + 1
+
+def inc (x):
+  return x + 1
+#+END_SRC
+
+** Anonymous Function
+It is simply a function without a name.
+
+#+BEGIN_SRC python
+lambda x: x + 1
+#+END_SRC
+
+#+BEGIN_SRC
+\x -> x + 1
+#+END_SRC
+
+** Free vs. bound variables & Closures
+A variable that is not bound in a given expression is a free variable.
+The values for these variables are picked up from environments the functions exist in.
+
+#+BEGIN_SRC
+\x -> x + y
+#+END_SRC
+
+y is free variable above
+
+A closure, is a function that makes use of free variables in its definition.
+The above function is a closure.
+
+** Function (contd..)
+
+#+BEGIN_SRC python
+inc = lambda x: x + 1
+#+END_SRC
+
+#+BEGIN_SRC clojure
+(+ 1 1)
+(defn inc [x] (+ x 1))
+#+END_SRC
+
+#+BEGIN_SRC
+inc = \x -> x + 1
+inc x = 1 + x
+#+END_SRC
+
+Question: Is function a value ? ( Can it be further reduced ? )
+
+** Function arity
+
+The number of arguments a function takes is its arity.
+
+#+BEGIN_SRC python
+# arity 0
+def zero ():
+  return 0
+
+# arity 1
+def inc (x):
+  return x + 1
+
+# arity 2
+def add (x, y):
+  return x + y
+#+END_SRC
+
+** Routine, Function & Procedure
+
+A routine is an abstraction that does not return a value.
+
+#+BEGIN_SRC python
+def a (x):
+  print x
+
+def b (x):
+  return x
+#+END_SRC
+
+a is a routine, b is a function.
+
+A procedure can either be a routine or a function.
+Routines are imperative in nature.
+
+** Questions so far ?
+
+Now that we have defined functions, we will be going further ahead.
+
+** Pure and Impure functions
+
+Functions that always produce the same result given the same input and have no side effects are called pure functions.
+
+The square of a number doesn’t change with the phases of the Moon.
+Also, calculating the square of a number should not have a side effect of warming your coffee.
+
+All pure functions are guaranteed to always return the same values.
+This actually changes quite a bit about how one can reason about code.
+
+** Pure and Impure functions (..contd)
+
+Which of the following is a pure function?
+
+#+BEGIN_SRC python
+def inc (x):
+  return x + 1
+
+def printandreturn (x):
+  print x
+  return x
+
+def rand (x):
+  return x * random.random()
+#+END_SRC
+
+In a pure functional language like Haskell all functions are pure.
+(For the curious ones here, side effects are modelled as pure functions using Monads, something I won't be talking about today.)
+
+** Referencial Transparency
+An expression that is deterministic and without side-effects is referencially transparent.
+
+It means it can be replaced by its value without changing the behaviour of the program.
+
+** Immutable vs. mutable data
+Immutable simply means that cannot change.
+Think "read-only", "constants", Git. (without rewriting history)
+
+Persistent Datastructures are immutable, and can’t be updated in-place.
+
+Instead an updated copy of it is created if needed during changes.
+
+* Abstraction and Application
+
+Two cornerstones of functional programming.
+
+** Function Application
+Calling a function with some arguments(values) is applying that function to those arguments.
+
+#+BEGIN_SRC clojure
+(f arg1 arg2)
+(+ 1 2)
+#+END_SRC
+
+#+BEGIN_SRC
+f arg1 arg2
+(+) 1 2
+1 + 2
+#+END_SRC
+
+** Higher Order functions
+
+Functions that can return functions, and take functions as argument.
+
+#+BEGIN_SRC python
+def apply (f, x, y):
+  return f(x, y)
+
+apply(add, 1, 2)
+
+def incrementer (n):
+  return lambda m: m + n
+
+add2 = incrementer(2)
+add2(4)
+#+END_SRC
+
+** Partial Application
+
+Take a function of arity n, and m < n arguments, and return a function of arity n - m.
+
+#+BEGIN_SRC
+f(a, b, x) = a * b + x
+
+f'  = partial f(2) = 2 * b + x
+f'(b,x) = 2 * b + x
+
+f'' = partial f'(7) = 2 * 7 + x
+f''(x) = 2 * 7 + x
+
+f''' = partial f''(3) = 2 * 7 + 3
+f'''(x) = 2 * 7 + 3
+#+END_SRC
+
+** Currying (Schönfinkeling)
+
+Schönfinkeling is the technique of transforming a function that takes multiple arguments (or an n-tuple of arguments) in such a way that it can be called as a chain of functions each with a single argument.
+
+#+BEGIN_SRC
+f(a, b, x) = a * b + x
+
+let cf = curried f(a,b,x) = \a -> \b -> \x -> (a * b + x)
+
+let cf'   = cf(2)  = \a -> \b -> \x -> (a * b + x) (2)    = \b -> \x -> (2 * b + x)
+let cf''  = cf'(2) = \b -> \x -> (2 * b + x) (7)          = \x -> (2 * 7 + x)
+let cf''' = cf'(2) = \x -> (2 * 7 + x) (3)                = (2 * 7 + 3)
+#+END_SRC
+
+In Haskell, all functions are curried by default.
+
+** Lazy vs Strict/Eager evaluation
+Function arguments are not evaluated until the function is actually invoked.
+
+Lazy evaluation makes it harder to reason about space consumed by running program,
+but gives rise to other benefits (avoid repeated calculations, infinite datastructures)
+
+Note : REPL is not lazy
+
+#+BEGIN_SRC
+endless x = x:endless(x)
+endlessTwos = endless 2
+take 4 endlessTwos
+#+END_SRC
+
+** Questions so far ?
+
+Now that we have finished defining function behaviour, we can take a look at some basic operations.
+
+* Functional building blocks
+
+** map
+applies a function to each element in a collection to yield a new collection
+- abstracting away the managed iteration
+- not only Lists, these can be applied to anything that can be modelled as a collection
+
+#+BEGIN_SRC
+map inc [1 2 3]
+#+END_SRC
+
+** filter
+applies a predicate(function) to each element in a collection to yield a new collection including the ones for which the predicate was true
+- abstracting away the conditional
+- applies over a collection
+
+#+BEGIN_SRC
+(filter even? [5 123 46])
+#+END_SRC
+
+** fold (reduce)
+applies a function that folds the collection with one element at a time (sticky notes fold)
+- abstracting away the combination
+
+#+BEGIN_SRC
+(reduce + [1 2 3])
+#+END_SRC
+
+** list comprehensions / generators
+used for generating collections based on certain critieria
+- abstracting away the generation
+
+[Function | Domain/Input, Predicate]
+
+#+BEGIN_SRC
+[x*y | x <- [1..10], y <- [3..6], x > 5]
+#+END_SRC
+
+#+BEGIN_SRC clojure
+(for [x (range 1 10) :when (even? x)
+      y (range 1 10)]
+  (* x y))
+#+END_SRC
+
+** Recursion
+
+#+BEGIN_SRC clojure
+(defn factorial [n]
+  (if (zero? n)
+    1
+    (* n factorial)))
+#+END_SRC
+
+** Pattern matching
+
+#+BEGIN_SRC
+factorial 0 = 1
+factorial n = n * factorial (n - 1)
+#+END_SRC
+
+** Tail Recursion / Tail Call optimization
+
+#+BEGIN_SRC
+factorial' 0 acc = acc
+factorial' n acc = factorial1 n-1, n * acc
+
+factorial 0 = 1
+factorial n = factorial' n 1
+#+END_SRC
+
+** Function Composition
+
+[[./images/composition.jpg]]
+
+** Function Composition (..contd)
+
+Gluing functions together to create a new one.
+
+#+BEGIN_SRC clojure
+(def twice (partial * 2))
+(def thrice (partial * 3))
+(def six-times (comp twice thrice))
+#+END_SRC
+
+#+BEGIN_SRC
+twice = (*) 2
+threePlus = (+) 3
+threePlusAndTwice = twice . threePlus
+-- same as
+threePlusAndTwice x = twice ( threePlus x )
+#+END_SRC
+
+There are no variables defined in the intermediate functions.
+The power of partial applications (and / or currying)
+
+** Questions so far ?
+
+* Types
+
+#+ATTR_HTML: :width 60% :height 60%
+[[./images/sets.jpg]]
+
+
+** Types are there, whether you want them or not
+
+Types are sets of values.
+
+1 belongs to several types: it’s an Integer, a Number, a Value, the value 1.
+
+One of the elements of the set of all Numbers.
+One of the elements of the set of all Integers.
+The only element in the set of all values that are 1.
+
+1 has the type Value, Integer, Being 1
+
+** Static vs. Dynamic
+
+Old discussion.
+
+Dynamic : Defer the decision to deal with types until the program is executed
+
+Static  : Eliminiate incorrect programs before they are even run
+
+#+BEGIN_NOTES
+Static Types : Everything is of a certain type (or belongs to a group/class of type)
+Int, String, List of Integers etc.
+
+Dynamic Types : Everything can be of any type ( hence unityped )
+Type : Int | String | List | ....... | All possible types
+
+Thought experiment
+#+END_NOTES
+
+** Why bother with type systems ?
+
+#+ATTR_HTML: :width 60% :height 60%
+[[./images/types.jpg]]
+
+#+BEGIN_NOTES
+Monkeys, bananas
+- machine lang. , random bytes, all get bananas
+- high level lang., lexical & grammatical error detected, few monkeys get bananas, more useful programs
+- strong static types, another barrier is added against nonsensical programs
+- richer type systems, more narrow the region of correct and useful programs
+#+END_NOTES
+
+** Types are about composability
+
+Functions map from a set of values (type) to a set of values (type)
+
+Argument values ----------> Function -------------> Return Value
+   Type ---------------------------------------------> Type
+
+The target of one function must be same as the source of another function if they were to be composed.
+
+#+BEGIN_NOTES
+We pass the results on one function to another.
+The program will not work if the target function is not able to correctly interpret the data produced by the source function.
+The two ends must fit for the composition to work.
+The stronger the type system of the language, the better this match can be described and mechanically verified.
+#+END_NOTES
+
+** Modules / Namespaces / Packages
+
+Collection of related functions.
+Also determines what function are exported(visible from outside).
+
+Decompose to as many small functions as you deem reasonable.
+Only export the functions / types that is required to be used by other packages.
+
+Think CommonJS style exports. Golang implicit exports.
+
+Some languages take this to a whole different level by making modules as values.
+Eg. OCaml
+
+
+* Polymorphism
+
+adj. having or occurring in several distinct forms
+
+- Subtyping
+- Parametric polymorphism
+- Ad-hoc polymorphism
+
+** Parametric polymorphism
+
+Parametric polymorphism refers to when the type of a value contains
+one or more (unconstrained) type variables, so that the value may
+adopt any type that results from substituting those variables with
+concrete types.
+
+#+BEGIN_SRC
+id :: a -> a
+id x = x
+#+END_SRC
+
+Can be used in context requiring
+
+#+BEGIN_SRC
+Integer -> Integer
+Char -> Char
+.. -> ..
+#+END_SRC
+
+** Ad-hoc polymorphism
+
+Ad-hoc polymorphism refers to when a value is able to adopt any one of
+several types because it, has been given a
+separate definition for each of those types.
+
+- Type Class in Haskell
+- Protocols in Clojure
+
+#+BEGIN_NOTES
+The + operator essentially does something entirely
+different when applied to floating-point values as compared to when
+applied to integers
+#+END_NOTES
+
+** Ad-hoc polymorphism (...contd)
+
+#+BEGIN_SRC
+data Duck = Duck | DaffyDuck
+data Horse = Horse
+
+class Walker a where
+  walk :: a -> String
+
+instance Walker Duck where
+  walk Duck = "wobble"
+  walk DaffyDuck = "run"
+
+instance Walker Horse where
+  walk horse = "gallop"
+
+walk_a_lot :: Walker a => a -> [String]
+walk_a_lot walker = take 3 $ repeat (walk walker)
+#+END_SRC
+
+* So much more stuff, but will have to wrap here.
+
+Lot more to explore, but this should be common to all languages that call themselves 'Functional'
+
+** Thanks
+
+@suvash

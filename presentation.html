@@ -1,0 +1,1161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Functional Programming fundamentals</title>
+<meta name="author" content="(Suvash Thapaliya (@suvash))"/>
+
+<link rel="stylesheet" href="./reveal.js/css/reveal.css"/>
+<link rel="stylesheet" href="./reveal.js/css/theme/white.css" id="theme"/>
+
+<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+<script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = './reveal.js/css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+</script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section id="sec-title-slide">
+<h1>Functional Programming fundamentals</h1>
+<h2>Suvash Thapaliya (@suvash)</h2>
+<h2><a href="mailto:hi@suva.sh">hi@suva.sh</a></h2>
+<h2>2015-05-28</h2>
+</section>
+
+<section>
+<section id="slide-sec-1">
+<h2 id="sec-1">Agenda</h2>
+<aside class="notes">
+<ul class="org-ul">
+<li>Why now ? Why today ?
+</li>
+</ul>
+
+</aside>
+
+</section>
+<section id="slide-sec-1-1">
+<h3 id="sec-1-1">The Dress</h3>
+
+<div class="figure">
+<p><img src="./images/thedress.jpg" alt="thedress.jpg" />
+</p>
+</div>
+
+</section>
+<section id="slide-sec-1-2">
+<h3 id="sec-1-2">It's a &#x2026;.. !</h3>
+
+<div class="figure">
+<p><img src="./images/duck_rabbit.jpg" alt="duck_rabbit.jpg" />
+</p>
+</div>
+
+<aside class="notes">
+<ul class="org-ul">
+<li>Introduce terminologies and set the foundations for a different way of viewing at the world.
+</li>
+<li>will probably talk about obvious things now and then. allow me to be a bit pedantic &#x2026;
+</li>
+<li>Present small examples that can be built upon. (Not big applications yet, some other day maybe)
+</li>
+<li>not planning to do magic demos to blow your minds
+</li>
+<li>not intending to convince you that FP will take over the world
+</li>
+<li>not supposed to be a comparision / bashing on a certain paradigm.
+</li>
+<li>all models of computation eventually intend to produce artifacts that can be run on a certain computer architecture.
+</li>
+<li>feel free to question me anywhere. I might not have all the answers, but will try my best.
+</li>
+<li>like calculus/other hard things, sometimes the intuition isn't there in the beginning
+</li>
+<li>sometimes one has to first learn the concepts, intuition comes afterwards
+</li>
+<li>will consider this a success if I somehow manage to infect you minds to go and look more into FP.
+</li>
+</ul>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-sec-2">
+<h2 id="sec-2">Paradigm</h2>
+<p>
+n. A set of assumptions, concepts, values, and practices that
+constitutes a way of viewing reality for the community that shares
+them, especially in an intellectual discipline.
+</p>
+
+</section>
+<section id="slide-sec-2-1">
+<h3 id="sec-2-1">What we already know</h3>
+
+<div class="figure">
+<p><img src="./images/oleg_shuplyak.jpg" alt="oleg_shuplyak.jpg" width="40%" height="40%" />
+</p>
+</div>
+
+<aside class="notes">
+<ul class="org-ul">
+<li>When we read/write a program, we simulate the world the program runs in and reason about it
+</li>
+<li>How we decide to simulate and reason the program eventually is influenced by the paradigm we are in
+</li>
+<li>Different programming paradigms : Imperative, OOP, FP, Logic, Stack etc.
+</li>
+</ul>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-sec-3">
+<h2 id="sec-3">Programming</h2>
+<p>
+"Take the contents of memory address x and add it to the contents of the register EAX."
+</p>
+
+<ul>
+<li>Compose / Decompose</li>
+
+</ul>
+
+<aside class="notes">
+<ul class="org-ul">
+<li>Trying to solve a non trivial problem. How do we solve problems ?
+</li>
+<li>Decompose bigger to smaller problems until all small problems are solved.
+</li>
+<li>The essence : Compose those small solutions to solve a bigger problem.
+</li>
+<li>In hindsight, decomposition wouldn't make sense if we couldn't put the pieces back together.
+</li>
+</ul>
+
+</aside>
+
+</section>
+</section>
+<section>
+<section id="slide-sec-4">
+<h2 id="sec-4">History of Functional Programming</h2>
+<ul>
+<li>Lambda Calculus (Church &amp; Rosser 1936)</li>
+<li>LISP (McCarthy 1960)</li>
+<li>ML (1973) -&#x2014; SmallTalk/C (1972)</li>
+<li>Miranda (1985)</li>
+<li>Haskell (1992)</li>
+<li>OCaml (1996)</li>
+<li>Clojure (2009)</li>
+<li>Idris (2011)
+
+<p>
+and many more to come.
+</p></li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-sec-5">
+<h2 id="sec-5">Let's get started</h2>
+<p>
+Define terminologies as precisely as we can.
+</p>
+
+</section>
+<section id="slide-sec-5-1">
+<h3 id="sec-5-1">Value</h3>
+<p>
+Final result of a computation. Cannot be further reduced.
+Eg. 4, 'Hello'
+</p>
+
+<aside class="notes">
+<p>
+Anything that is a value is also known as a first class member in the given language.
+</p>
+
+</aside>
+
+</section>
+<section id="slide-sec-5-2">
+<h3 id="sec-5-2">Expression</h3>
+<p>
+A symbol or combination of symbols that represents a value or a relationship between values.
+Eg. 1 + 1 (reduces to 2), 2 is both a value and an expression.
+</p>
+
+<p>
+All values are expressions.
+</p>
+
+<aside class="notes">
+<p>
+Don't get confused yet that everything is an expression.
+</p>
+
+</aside>
+
+</section>
+<section id="slide-sec-5-3">
+<h3 id="sec-5-3">Evaluation</h3>
+<p>
+The reduction of an expression to a value is called evaluation.
+</p>
+
+<div class="org-src-container">
+
+<pre  class="src src-python">1 + 1 + 1
+1 + 2
+3
+</pre>
+</div>
+
+</section>
+<section id="slide-sec-5-4">
+<h3 id="sec-5-4">Evaluation (..contd)</h3>
+<pre class="example">
++------------+
+| Expression |
++------------+
+      |
+      V
++------------+
+| Evaluation |
++------------+
+      |
+      V
++------------+
+|   Value    |
++------------+
+</pre>
+
+</section>
+<section id="slide-sec-5-5">
+<h3 id="sec-5-5">Variables</h3>
+<p>
+A reference to a value is a variable.
+</p>
+
+<div class="org-src-container">
+
+<pre  class="src src-python"><span style="color: #DFAF8F;">a</span> = 2
+</pre>
+</div>
+
+</section>
+<section id="slide-sec-5-6">
+<h3 id="sec-5-6">Side effects</h3>
+<p>
+A step in the evaluation of an expression that has effects (read: changes/updates etc.) outside the expression itself is called a side effect.
+</p>
+
+<div class="org-src-container">
+
+<pre  class="src src-python"><span style="color: #F0DFAF; font-weight: bold;">print</span> <span style="color: #CC9393;">"hello"</span>
+
+<span style="color: #DFAF8F;">a</span> = 1; <span style="color: #DFAF8F;">a</span> += 1
+</pre>
+</div>
+
+</section>
+<section id="slide-sec-5-7">
+<h3 id="sec-5-7">Side effects (&#x2026;contd)</h3>
+<pre class="example">
++------------+
+| Expression |
++------------+
+      |
+      V
++------------+
+| Evaluation |~~~&gt; Side Effect
++------------+
+      |
+      V
++------------+
+|   Value    |
++------------+
+</pre>
+
+</section>
+<section id="slide-sec-5-8">
+<h3 id="sec-5-8">Statement</h3>
+<p>
+An expression that evaluates to nothing is a statement.
+</p>
+
+<p>
+Expression in Python:
+</p>
+<div class="org-src-container">
+
+<pre  class="src src-python"><span style="color: #DFAF8F;">a</span> = 1 + 1
+<span style="color: #DFAF8F;">a</span> = <span style="color: #F0DFAF; font-weight: bold;">lambda</span> x: x ** 2
+</pre>
+</div>
+
+<p>
+Statement in Python:
+</p>
+<div class="org-src-container">
+
+<pre  class="src src-python"><span style="color: #F0DFAF; font-weight: bold;">if</span> <span style="color: #BFEBBF;">True</span>:
+  <span style="color: #DFAF8F;">a</span> = 5 + 2456
+<span style="color: #F0DFAF; font-weight: bold;">else</span>:
+  <span style="color: #DFAF8F;">a</span> = <span style="color: #CC9393;">'goodbye'</span>
+</pre>
+</div>
+
+</section>
+<section id="slide-sec-5-9">
+<h3 id="sec-5-9">Statement (&#x2026;contd)</h3>
+<p>
+Only expressions in Clojure and Haskell
+</p>
+
+<div class="org-src-container">
+
+<pre  class="src src-clojure"><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #DFAF8F;">a</span>
+  <span style="color: #BFEBBF;">(</span><span style="color: #F0DFAF; font-weight: bold;">if</span> <span style="color: #BFEBBF;">true</span> <span style="color: #CC9393;">"hello"</span> <span style="color: #CC9393;">"goodbye"</span><span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
+</pre>
+</div>
+
+<pre  class="example">
+a = if True
+    then "hello"
+    else "goodbye"
+</pre>
+
+</section>
+<section id="slide-sec-5-10">
+<h3 id="sec-5-10">What's up with statements ?</h3>
+<p>
+Statements perform/require side effects and are intrinsically imperative.
+(Insight: since they cannot be reduced to a value, they must be effecting beyond their bounds)
+</p>
+
+<p>
+Statements are NOT values.
+</p>
+
+<pre class="example">
++------------+
+| Statement  |
++------------+
+      |
+      V
++------------+
+| Evaluation |~~~&gt; Side Effect
++------------+
+      |
+      X
+</pre>
+
+
+</section>
+<section id="slide-sec-5-11">
+<h3 id="sec-5-11">Questions so far ?</h3>
+<p>
+Some of these things seem obvious, but they have huge implications on how one starts looking at programs.
+</p>
+
+<p>
+Especially how side effects differentiate expressions/values from statements, as this is really the foundation that functional programming builds upon.
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-sec-6">
+<h2 id="sec-6">Hello Functions !</h2>
+<p>
+Simply a mapping of a set of values(aka domain) to another set of values(aka codomain).
+</p>
+
+
+<div class="figure">
+<p><img src="./images/function.png" alt="function.png" />
+</p>
+</div>
+
+</section>
+<section id="slide-sec-6-1">
+<h3 id="sec-6-1">Function</h3>
+<p>
+A function is an abstraction over expression, where one or several values in the expression are replaced by variables.
+</p>
+
+
+<div class="org-src-container">
+
+<pre  class="src src-python">3 + 1
+4 + 1
+5 + 1
+
+<span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">inc</span> (x):
+  <span style="color: #F0DFAF; font-weight: bold;">return</span> x + 1
+</pre>
+</div>
+
+</section>
+<section id="slide-sec-6-2">
+<h3 id="sec-6-2">Anonymous Function</h3>
+<p>
+It is simply a function without a name.
+</p>
+
+<div class="org-src-container">
+
+<pre  class="src src-python"><span style="color: #F0DFAF; font-weight: bold;">lambda</span> x: x + 1
+</pre>
+</div>
+
+<pre  class="example">
+\x -&gt; x + 1
+</pre>
+
+</section>
+<section id="slide-sec-6-3">
+<h3 id="sec-6-3">Free vs. bound variables &amp; Closures</h3>
+<p>
+A variable that is not bound in a given expression is a free variable.
+The values for these variables are picked up from environments the functions exist in.
+</p>
+
+<pre  class="example">
+\x -&gt; x + y
+</pre>
+
+<p>
+y is free variable above
+</p>
+
+<p>
+A closure, is a function that makes use of free variables in its definition.
+The above function is a closure.
+</p>
+
+</section>
+<section id="slide-sec-6-4">
+<h3 id="sec-6-4">Function (contd..)</h3>
+<div class="org-src-container">
+
+<pre  class="src src-python"><span style="color: #DFAF8F;">inc</span> = <span style="color: #F0DFAF; font-weight: bold;">lambda</span> x: x + 1
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre  class="src src-clojure"><span style="color: #DCDCCC;">(</span>+ 1 1<span style="color: #DCDCCC;">)</span>
+<span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">defn</span> <span style="color: #93E0E3;">inc</span> <span style="color: #BFEBBF;">[</span>x<span style="color: #BFEBBF;">]</span> <span style="color: #BFEBBF;">(</span>+ x 1<span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
+</pre>
+</div>
+
+<pre  class="example">
+inc = \x -&gt; x + 1
+inc x = 1 + x
+</pre>
+
+<p>
+Question: Is function a value ? ( Can it be further reduced ? )
+</p>
+
+</section>
+<section id="slide-sec-6-5">
+<h3 id="sec-6-5">Function arity</h3>
+<p>
+The number of arguments a function takes is its arity.
+</p>
+
+<div class="org-src-container">
+
+<pre  class="src src-python"><span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">arity 0</span>
+<span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">zero</span> ():
+  <span style="color: #F0DFAF; font-weight: bold;">return</span> 0
+
+<span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">arity 1</span>
+<span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">inc</span> (x):
+  <span style="color: #F0DFAF; font-weight: bold;">return</span> x + 1
+
+<span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">arity 2</span>
+<span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">add</span> (x, y):
+  <span style="color: #F0DFAF; font-weight: bold;">return</span> x + y
+</pre>
+</div>
+
+</section>
+<section id="slide-sec-6-6">
+<h3 id="sec-6-6">Routine, Function &amp; Procedure</h3>
+<p>
+A routine is an abstraction that does not return a value.
+</p>
+
+<div class="org-src-container">
+
+<pre  class="src src-python"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">a</span> (x):
+  <span style="color: #F0DFAF; font-weight: bold;">print</span> x
+
+<span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">b</span> (x):
+  <span style="color: #F0DFAF; font-weight: bold;">return</span> x
+</pre>
+</div>
+
+<p>
+a is a routine, b is a function.
+</p>
+
+<p>
+A procedure can either be a routine or a function.
+Routines are imperative in nature.
+</p>
+
+</section>
+<section id="slide-sec-6-7">
+<h3 id="sec-6-7">Questions so far ?</h3>
+<p>
+Now that we have defined functions, we will be going further ahead.
+</p>
+
+</section>
+<section id="slide-sec-6-8">
+<h3 id="sec-6-8">Pure and Impure functions</h3>
+<p>
+Functions that always produce the same result given the same input and have no side effects are called pure functions.
+</p>
+
+<p>
+The square of a number doesn’t change with the phases of the Moon.
+Also, calculating the square of a number should not have a side effect of warming your coffee.
+</p>
+
+<p>
+All pure functions are guaranteed to always return the same values.
+This actually changes quite a bit about how one can reason about code.
+</p>
+
+</section>
+<section id="slide-sec-6-9">
+<h3 id="sec-6-9">Pure and Impure functions (..contd)</h3>
+<p>
+Which of the following is a pure function?
+</p>
+
+<div class="org-src-container">
+
+<pre  class="src src-python"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">inc</span> (x):
+  <span style="color: #F0DFAF; font-weight: bold;">return</span> x + 1
+
+<span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">printandreturn</span> (x):
+  <span style="color: #F0DFAF; font-weight: bold;">print</span> x
+  <span style="color: #F0DFAF; font-weight: bold;">return</span> x
+
+<span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">rand</span> (x):
+  <span style="color: #F0DFAF; font-weight: bold;">return</span> x * random.random()
+</pre>
+</div>
+
+<p>
+In a pure functional language like Haskell all functions are pure.
+(For the curious ones here, side effects are modelled as pure functions using Monads, something I won't be talking about today.)
+</p>
+
+</section>
+<section id="slide-sec-6-10">
+<h3 id="sec-6-10">Referencial Transparency</h3>
+<p>
+An expression that is deterministic and without side-effects is referencially transparent.
+</p>
+
+<p>
+It means it can be replaced by its value without changing the behaviour of the program.
+</p>
+
+</section>
+<section id="slide-sec-6-11">
+<h3 id="sec-6-11">Immutable vs. mutable data</h3>
+<p>
+Immutable simply means that cannot change.
+Think "read-only", "constants", Git. (without rewriting history)
+</p>
+
+<p>
+Persistent Datastructures are immutable, and can’t be updated in-place.
+</p>
+
+<p>
+Instead an updated copy of it is created if needed during changes.
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-sec-7">
+<h2 id="sec-7">Abstraction and Application</h2>
+<p>
+Two cornerstones of functional programming.
+</p>
+
+</section>
+<section id="slide-sec-7-1">
+<h3 id="sec-7-1">Function Application</h3>
+<p>
+Calling a function with some arguments(values) is applying that function to those arguments.
+</p>
+
+<div class="org-src-container">
+
+<pre  class="src src-clojure"><span style="color: #DCDCCC;">(</span>f arg1 arg2<span style="color: #DCDCCC;">)</span>
+<span style="color: #DCDCCC;">(</span>+ 1 2<span style="color: #DCDCCC;">)</span>
+</pre>
+</div>
+
+<pre  class="example">
+f arg1 arg2
+(+) 1 2
+1 + 2
+</pre>
+
+</section>
+<section id="slide-sec-7-2">
+<h3 id="sec-7-2">Higher Order functions</h3>
+<p>
+Functions that can return functions, and take functions as argument.
+</p>
+
+<div class="org-src-container">
+
+<pre  class="src src-python"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">apply</span> (f, x, y):
+  <span style="color: #F0DFAF; font-weight: bold;">return</span> f(x, y)
+
+<span style="color: #DCDCCC; font-weight: bold;">apply</span>(add, 1, 2)
+
+<span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">incrementer</span> (n):
+  <span style="color: #F0DFAF; font-weight: bold;">return</span> <span style="color: #F0DFAF; font-weight: bold;">lambda</span> m: m + n
+
+<span style="color: #DFAF8F;">add2</span> = incrementer(2)
+add2(4)
+</pre>
+</div>
+
+</section>
+<section id="slide-sec-7-3">
+<h3 id="sec-7-3">Partial Application</h3>
+<p>
+Take a function of arity n, and m &lt; n arguments, and return a function of arity n - m.
+</p>
+
+<pre  class="example">
+f(a, b, x) = a * b + x
+
+f'  = partial f(2) = 2 * b + x
+f'(b,x) = 2 * b + x
+
+f'' = partial f'(7) = 2 * 7 + x
+f''(x) = 2 * 7 + x
+
+f''' = partial f''(3) = 2 * 7 + 3
+f'''(x) = 2 * 7 + 3
+</pre>
+
+</section>
+<section id="slide-sec-7-4">
+<h3 id="sec-7-4">Currying (Schönfinkeling)</h3>
+<p>
+Schönfinkeling is the technique of transforming a function that takes multiple arguments (or an n-tuple of arguments) in such a way that it can be called as a chain of functions each with a single argument.
+</p>
+
+<pre  class="example">
+f(a, b, x) = a * b + x
+
+let cf = curried f(a,b,x) = \a -&gt; \b -&gt; \x -&gt; (a * b + x)
+
+let cf'   = cf(2)  = \a -&gt; \b -&gt; \x -&gt; (a * b + x) (2)    = \b -&gt; \x -&gt; (2 * b + x)
+let cf''  = cf'(2) = \b -&gt; \x -&gt; (2 * b + x) (7)          = \x -&gt; (2 * 7 + x)
+let cf''' = cf'(2) = \x -&gt; (2 * 7 + x) (3)                = (2 * 7 + 3)
+</pre>
+
+<p>
+In Haskell, all functions are curried by default.
+</p>
+
+</section>
+<section id="slide-sec-7-5">
+<h3 id="sec-7-5">Lazy vs Strict/Eager evaluation</h3>
+<p>
+Function arguments are not evaluated until the function is actually invoked.
+</p>
+
+<p>
+Lazy evaluation makes it harder to reason about space consumed by running program,
+but gives rise to other benefits (avoid repeated calculations, infinite datastructures)
+</p>
+
+<p>
+Note : REPL is not lazy
+</p>
+
+<pre  class="example">
+endless x = x:endless(x)
+endlessTwos = endless 2
+take 4 endlessTwos
+</pre>
+
+</section>
+<section id="slide-sec-7-6">
+<h3 id="sec-7-6">Questions so far ?</h3>
+<p>
+Now that we have finished defining function behaviour, we can take a look at some basic operations.
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-sec-8">
+<h2 id="sec-8">Functional building blocks</h2>
+<div class="outline-text-2" id="text-8">
+</div></section>
+<section id="slide-sec-8-1">
+<h3 id="sec-8-1">map</h3>
+<p>
+applies a function to each element in a collection to yield a new collection
+</p>
+<ul>
+<li>abstracting away the managed iteration</li>
+<li>not only Lists, these can be applied to anything that can be modelled as a collection</li>
+
+</ul>
+
+<pre  class="example">
+map inc [1 2 3]
+</pre>
+
+</section>
+<section id="slide-sec-8-2">
+<h3 id="sec-8-2">filter</h3>
+<p>
+applies a predicate(function) to each element in a collection to yield a new collection including the ones for which the predicate was true
+</p>
+<ul>
+<li>abstracting away the conditional</li>
+<li>applies over a collection</li>
+
+</ul>
+
+<pre  class="example">
+(filter even? [5 123 46])
+</pre>
+
+</section>
+<section id="slide-sec-8-3">
+<h3 id="sec-8-3">fold (reduce)</h3>
+<p>
+applies a function that folds the collection with one element at a time (sticky notes fold)
+</p>
+<ul>
+<li>abstracting away the combination</li>
+
+</ul>
+
+<pre  class="example">
+(reduce + [1 2 3])
+</pre>
+
+</section>
+<section id="slide-sec-8-4">
+<h3 id="sec-8-4">list comprehensions / generators</h3>
+<p>
+used for generating collections based on certain critieria
+</p>
+<ul>
+<li>abstracting away the generation</li>
+
+</ul>
+
+<p>
+[Function | Domain/Input, Predicate]
+</p>
+
+<pre  class="example">
+[x*y | x &lt;- [1..10], y &lt;- [3..6], x &gt; 5]
+</pre>
+
+<div class="org-src-container">
+
+<pre  class="src src-clojure"><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">for</span> <span style="color: #BFEBBF;">[</span>x <span style="color: #D0BF8F;">(</span>range 1 10<span style="color: #D0BF8F;">)</span> <span style="color: #BFEBBF;">:when</span> <span style="color: #D0BF8F;">(</span>even? x<span style="color: #D0BF8F;">)</span>
+      y <span style="color: #D0BF8F;">(</span>range 1 10<span style="color: #D0BF8F;">)</span><span style="color: #BFEBBF;">]</span>
+  <span style="color: #BFEBBF;">(</span>* x y<span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
+</pre>
+</div>
+
+</section>
+<section id="slide-sec-8-5">
+<h3 id="sec-8-5">Recursion</h3>
+<div class="org-src-container">
+
+<pre  class="src src-clojure"><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">defn</span> <span style="color: #93E0E3;">factorial</span> <span style="color: #BFEBBF;">[</span>n<span style="color: #BFEBBF;">]</span>
+  <span style="color: #BFEBBF;">(</span><span style="color: #F0DFAF; font-weight: bold;">if</span> <span style="color: #D0BF8F;">(</span>zero? n<span style="color: #D0BF8F;">)</span>
+    1
+    <span style="color: #D0BF8F;">(</span>* n factorial<span style="color: #D0BF8F;">)</span><span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
+</pre>
+</div>
+
+</section>
+<section id="slide-sec-8-6">
+<h3 id="sec-8-6">Pattern matching</h3>
+<pre  class="example">
+factorial 0 = 1
+factorial n = n * factorial (n - 1)
+</pre>
+
+</section>
+<section id="slide-sec-8-7">
+<h3 id="sec-8-7">Tail Recursion / Tail Call optimization</h3>
+<pre  class="example">
+factorial' 0 acc = acc
+factorial' n acc = factorial1 n-1, n * acc
+
+factorial 0 = 1
+factorial n = factorial' n 1
+</pre>
+
+</section>
+<section id="slide-sec-8-8">
+<h3 id="sec-8-8">Function Composition</h3>
+
+<div class="figure">
+<p><img src="./images/composition.jpg" alt="composition.jpg" />
+</p>
+</div>
+
+</section>
+<section id="slide-sec-8-9">
+<h3 id="sec-8-9">Function Composition (..contd)</h3>
+<p>
+Gluing functions together to create a new one.
+</p>
+
+<div class="org-src-container">
+
+<pre  class="src src-clojure"><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #DFAF8F;">twice</span> <span style="color: #BFEBBF;">(</span>partial * 2<span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
+<span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #DFAF8F;">thrice</span> <span style="color: #BFEBBF;">(</span>partial * 3<span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
+<span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #DFAF8F;">six-times</span> <span style="color: #BFEBBF;">(</span>comp twice thrice<span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
+</pre>
+</div>
+
+<pre  class="example">
+twice = (*) 2
+threePlus = (+) 3
+threePlusAndTwice = twice . threePlus
+-- same as
+threePlusAndTwice x = twice ( threePlus x )
+</pre>
+
+<p>
+There are no variables defined in the intermediate functions.
+The power of partial applications (and / or currying)
+</p>
+
+</section>
+<section id="slide-sec-8-10">
+<h3 id="sec-8-10">Questions so far ?</h3>
+
+</section>
+</section>
+<section>
+<section id="slide-sec-9">
+<h2 id="sec-9">Types</h2>
+
+<div class="figure">
+<p><img src="./images/sets.jpg" alt="sets.jpg" width="60%" height="60%" />
+</p>
+</div>
+
+
+</section>
+<section id="slide-sec-9-1">
+<h3 id="sec-9-1">Types are there, whether you want them or not</h3>
+<p>
+Types are sets of values.
+</p>
+
+<p>
+1 belongs to several types: it’s an Integer, a Number, a Value, the value 1.
+</p>
+
+<p>
+One of the elements of the set of all Numbers.
+One of the elements of the set of all Integers.
+The only element in the set of all values that are 1.
+</p>
+
+<p>
+1 has the type Value, Integer, Being 1
+</p>
+
+</section>
+<section id="slide-sec-9-2">
+<h3 id="sec-9-2">Static vs. Dynamic</h3>
+<p>
+Old discussion.
+</p>
+
+<p>
+Dynamic : Defer the decision to deal with types until the program is executed
+</p>
+
+<p>
+Static  : Eliminiate incorrect programs before they are even run
+</p>
+
+<aside class="notes">
+<p>
+Static Types : Everything is of a certain type (or belongs to a group/class of type)
+Int, String, List of Integers etc.
+</p>
+
+<p>
+Dynamic Types : Everything can be of any type ( hence unityped )
+Type : Int | String | List | &#x2026;&#x2026;. | All possible types
+</p>
+
+<p>
+Thought experiment
+</p>
+
+</aside>
+
+</section>
+<section id="slide-sec-9-3">
+<h3 id="sec-9-3">Why bother with type systems ?</h3>
+
+<div class="figure">
+<p><img src="./images/types.jpg" alt="types.jpg" width="60%" height="60%" />
+</p>
+</div>
+
+<aside class="notes">
+<p>
+Monkeys, bananas
+</p>
+<ul class="org-ul">
+<li>machine lang. , random bytes, all get bananas
+</li>
+<li>high level lang., lexical &amp; grammatical error detected, few monkeys get bananas, more useful programs
+</li>
+<li>strong static types, another barrier is added against nonsensical programs
+</li>
+<li>richer type systems, more narrow the region of correct and useful programs
+</li>
+</ul>
+
+</aside>
+
+</section>
+<section id="slide-sec-9-4">
+<h3 id="sec-9-4">Types are about composability</h3>
+<p>
+Functions map from a set of values (type) to a set of values (type)
+</p>
+
+<p>
+Argument values -&#x2014;&#x2014;&#x2014;&gt; Function -&#x2014;&#x2014;&#x2014;&#x2014;&gt; Return Value
+   Type &#x2014;&#x2014;&#x2014;&#x2014;&#x2014;&#x2014;&#x2014;&#x2014;&#x2014;&#x2014;&#x2014;&#x2014;&#x2014;&#x2014;&#x2014;&gt; Type
+</p>
+
+<p>
+The target of one function must be same as the source of another function if they were to be composed.
+</p>
+
+<aside class="notes">
+<p>
+We pass the results on one function to another.
+The program will not work if the target function is not able to correctly interpret the data produced by the source function.
+The two ends must fit for the composition to work.
+The stronger the type system of the language, the better this match can be described and mechanically verified.
+</p>
+
+</aside>
+
+</section>
+<section id="slide-sec-9-5">
+<h3 id="sec-9-5">Modules / Namespaces / Packages</h3>
+<p>
+Collection of related functions.
+Also determines what function are exported(visible from outside).
+</p>
+
+<p>
+Decompose to as many small functions as you deem reasonable.
+Only export the functions / types that is required to be used by other packages.
+</p>
+
+<p>
+Think CommonJS style exports. Golang implicit exports.
+</p>
+
+<p>
+Some languages take this to a whole different level by making modules as values.
+Eg. OCaml
+</p>
+
+
+</section>
+</section>
+<section>
+<section id="slide-sec-10">
+<h2 id="sec-10">Polymorphism</h2>
+<p>
+adj. having or occurring in several distinct forms
+</p>
+
+<ul>
+<li>Subtyping</li>
+<li>Parametric polymorphism</li>
+<li>Ad-hoc polymorphism</li>
+
+</ul>
+
+</section>
+<section id="slide-sec-10-1">
+<h3 id="sec-10-1">Parametric polymorphism</h3>
+<p>
+Parametric polymorphism refers to when the type of a value contains
+one or more (unconstrained) type variables, so that the value may
+adopt any type that results from substituting those variables with
+concrete types.
+</p>
+
+<pre  class="example">
+id :: a -&gt; a
+id x = x
+</pre>
+
+<p>
+Can be used in context requiring
+</p>
+
+<pre  class="example">
+Integer -&gt; Integer
+Char -&gt; Char
+.. -&gt; ..
+</pre>
+
+</section>
+<section id="slide-sec-10-2">
+<h3 id="sec-10-2">Ad-hoc polymorphism</h3>
+<p>
+Ad-hoc polymorphism refers to when a value is able to adopt any one of
+several types because it, has been given a
+separate definition for each of those types.
+</p>
+
+<ul>
+<li>Type Class in Haskell</li>
+<li>Protocols in Clojure</li>
+
+</ul>
+
+<aside class="notes">
+<p>
+The + operator essentially does something entirely
+different when applied to floating-point values as compared to when
+applied to integers
+</p>
+
+</aside>
+
+</section>
+<section id="slide-sec-10-3">
+<h3 id="sec-10-3">Ad-hoc polymorphism (&#x2026;contd)</h3>
+<pre  class="example">
+data Duck = Duck | DaffyDuck
+data Horse = Horse
+
+class Walker a where
+  walk :: a -&gt; String
+
+instance Walker Duck where
+  walk Duck = "wobble"
+  walk DaffyDuck = "run"
+
+instance Walker Horse where
+  walk horse = "gallop"
+
+walk_a_lot :: Walker a =&gt; a -&gt; [String]
+walk_a_lot walker = take 3 $ repeat (walk walker)
+</pre>
+
+</section>
+</section>
+<section>
+<section id="slide-sec-11">
+<h2 id="sec-11">So much more stuff, but will have to wrap here.</h2>
+<p>
+Lot more to explore, but this should be common to all languages that call themselves 'Functional'
+</p>
+
+</section>
+<section id="slide-sec-11-1">
+<h3 id="sec-11-1">Thanks</h3>
+<p>
+@suvash
+</p>
+</section>
+</section>
+</div>
+</div>
+
+<script src="./reveal.js/lib/js/head.min.js"></script>
+<script src="./reveal.js/js/reveal.js"></script>
+
+<script>
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+
+controls: true,
+progress: true,
+history: false,
+center: true,
+slideNumber: true,
+rollingLinks: false,
+keyboard: true,
+overview: true,
+
+theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+transitionSpeed: 'default',
+multiplex: {
+    secret: '', // null if client
+    id: '', // id, obtained from socket.io server
+    url: '' // Location of socket.io server
+},
+
+// Optional libraries used to extend on reveal.js
+dependencies: [
+ { src: './reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+ { src: './reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+ { src: './reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+ { src: './reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+ { src: './reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+ { src: './reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+]
+});
+</script>
+</body>
+</html>
